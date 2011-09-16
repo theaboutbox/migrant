@@ -1,0 +1,3 @@
+module Migrant
+  # Your code goes here...
+end
