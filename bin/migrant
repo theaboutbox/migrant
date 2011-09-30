@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+require 'migrant'
+require 'migrant/cli'
+
+# Start the command line interface and let it process the commands
+Migrant::CLI.start
+
