@@ -5,7 +5,7 @@ Feature: Basic Configuration
   Scenario: Basic AWS Configuration
     Given a Migrantfile with the body
       """
-      Configuration.for('migrantfile') {
+      Configuration.for('migrant') {
         provider {
           name       'aws'
           access_key 'my_access_key'
@@ -28,7 +28,7 @@ Feature: Basic Configuration
   Scenario: Basic Rackspace Configuration
     Given a Migrantfile with the body
       """
-      Configuration.for('migrantfile') {
+      Configuration.for('migrant') {
         provider {
           name      'rackspace'
           user_name 'my_user_name'

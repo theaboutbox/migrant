@@ -15,7 +15,7 @@ module Migrant
         @config = config
       else
         Kernel.load 'Migrantfile'
-        @config = Configuration.for('migrantfile')
+        @config = Configuration.for('migrant')
       end
       if @environment_name.nil?
         @ui.notice "Using default environment"

@@ -9,7 +9,7 @@ Given /^a Migrantfile with the body$/ do |migrantfile_body|
     f
   end
   Kernel.load(tmpfile.path)
-  @config = Configuration.for('migrantfile')
+  @config = Configuration.for('migrant')
   @environment = Migrant::Environment.new(nil,@config)
 end
 

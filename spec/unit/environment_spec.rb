@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Migrant::Environment do
   before do
-    Configuration.for('migrantfile') {
+    Configuration.for('migrant') {
       provider {
         name      'rackspace'
         flavor_id 1
@@ -24,7 +24,7 @@ describe Migrant::Environment do
       }
     }
 
-    @cfg = Configuration.for('migrantfile')
+    @cfg = Configuration.for('migrant')
     @staging_env = Migrant::Environment.new('staging',@cfg)
     @production_env = Migrant::Environment.new('production',@cfg)
     @default_env = Migrant::Environment.new(nil,@cfg)
