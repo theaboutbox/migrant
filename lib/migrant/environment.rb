@@ -88,7 +88,7 @@ module Migrant
     end
 
     def info
-      box = @boxes.first
+      box = @boxes[@environment_name]
       if box.nil?
         @ui.info "There are no boxes running"
       else

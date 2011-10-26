@@ -9,8 +9,8 @@ module Migrant
 
       def connect
         @connection = Fog::Compute.new(:provider => 'Rackspace', 
-                                      :rackspace_api_key => @environment.config.rackspace.api_key,
-                                      :rackspace_username => @environment.config.rackspace.username)
+                                      :rackspace_api_key => @environment.setting('provider.api_key'),
+                                      :rackspace_username => @environment.setting('provider.user_name'))
       end
 
       def log_server_info

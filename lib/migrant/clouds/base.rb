@@ -24,8 +24,10 @@ module Migrant
         @environment = env
         @server_def = {:private_key_path => @environment.setting('ssh.private_key'),
           :public_key_path => @environment.setting('ssh.public_key')}
-        @server_def[:flavor_id] = @environment.setting('provider.flavor_id')
-        @server_def[:image_id] = @environment.setting('provider.image_id')
+        flavor_id = @environment.setting('provider.flavor_id')
+        @server_def[:flavor_id] = flavor_id unless flavor_id.nil?
+        image_id = @environment.setting('provider.image_id')
+        @server_def[:image_id] = image_id unless image_id.nil?
       end
 
       attr_accessor :connection
