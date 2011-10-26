@@ -10,6 +10,7 @@ module Migrant
     @source_root ||= Pathname.new(File.expand_path('../../', __FILE__))
   end
 end
+require 'migrant/version'
 require 'migrant/clouds'
 require 'migrant/provisioners'
 require 'migrant/bootstrappers'
