@@ -1,5 +1,5 @@
 file_cache_path "/tmp/migrant"
-cookbook_path ["/tmp/migrant/site-cookbooks","/tmp/migrant/cookbooks"]
-role_path ["/tmp/migrant/roles"]
+cookbook_path <%= cookbook_path.inspect %>
+role_path <%= role_path.inspect %>
 log_level :info
 

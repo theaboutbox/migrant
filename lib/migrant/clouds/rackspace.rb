@@ -1,9 +1,9 @@
 module Migrant
   module Clouds
     class Rackspace < Base
-      register :rackspace
+      register 'rackspace'
 
-      def initialize(env,config)
+      def initialize(env)
         super
       end
 
@@ -11,6 +11,14 @@ module Migrant
         @connection = Fog::Compute.new(:provider => 'Rackspace', 
                                       :rackspace_api_key => @environment.config.rackspace.api_key,
                                       :rackspace_username => @environment.config.rackspace.username)
+      end
+
+      def log_server_info
+        super
+        @environment.ui.notice "  Name:       #{@environment.server.name}"
+        @environment.ui.notice "  IP Address: #{@environment.server.addresses['public']}"
+        @environment.ui.notice "  Image ID:   #{@environment.server.image.name}"
+        @environment.ui.notice "  Flavor:     #{@environment.server.flavor.name}"
       end
     end
   end

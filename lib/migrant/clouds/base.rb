@@ -1,4 +1,5 @@
 require 'fog'
+require 'pry'
 module Migrant
   module Clouds
     
@@ -19,9 +20,12 @@ module Migrant
         @@clouds[shortcut]
       end
 
-      def initialize(env,config)
+      def initialize(env)
         @environment = env
-        @config = config
+        @server_def = {:private_key_path => @environment.setting('ssh.private_key'),
+          :public_key_path => @environment.setting('ssh.public_key')}
+        @server_def[:flavor_id] = @environment.setting('provider.flavor_id')
+        @server_def[:image_id] = @environment.setting('provider.image_id')
       end
 
       attr_accessor :connection
@@ -32,19 +36,17 @@ module Migrant
 
       def bootstrap_server
         @environment.ui.info "Launching Server..."
-        @environment.server = @connection.servers.bootstrap(
-          :private_key_path => @config.ssh_private_key,
-          :public_key_path => @config.ssh_public_key)
+        @environment.server = @connection.servers.bootstrap(@server_def)
         @environment.ui.notice "Server Launched!"
+        ip_address = @environment.setting('provider.ip_address')
+        unless ip_address.nil?
+          @connection.associate_address(@environment.server.id,ip_address)
+        end
         log_server_info
       end
 
       def log_server_info
         @environment.ui.notice "  ID:         #{@environment.server.id}"
-        @environment.ui.notice "  Name:       #{@environment.server.name}"
-        @environment.ui.notice "  IP Address: #{@environment.server.addresses['public']}"
-        @environment.ui.notice "  Image ID:   #{@environment.server.image.name}"
-        @environment.ui.notice "  Flavor:     #{@environment.server.flavor.name}"
       end
 
       # Set up connection information for a server and set up SSH keypair access
@@ -59,8 +61,7 @@ module Migrant
           @environment.ui.error "Cannot connect to server!"
           raise "Cannot find server"
         end
-        @environment.server.private_key_path = @config.ssh_private_key
-        @environment.server.public_key_path = @config.ssh_public_key
+        @environment.server.merge_attributes(@server_def)
       end
 
       def execute(commands)
@@ -69,7 +70,8 @@ module Migrant
           @environment.ui.info("$ #{cmd}")
           result = server.ssh cmd
           if (result[0].status != 0)
-            @environment.ui.error "Error executing command: #{cmd}\n#{result[0].stderr}"
+            @environment.ui.info(result[0].stdout)
+            @environment.ui.error "Error executing command: #{cmd}\n#{result.inspect}"
             raise "Remote Script Error"
           end
           @environment.ui.info(result[0].stdout)

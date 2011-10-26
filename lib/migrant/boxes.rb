@@ -17,15 +17,17 @@ module Migrant
   # migrant configuration
   class Boxes
     # Returns an Boxes instance
-    def self.load(path)
-      boxes = []
-      boxes = YAML.load(File.read(path)) if File.exists?(path)
-      Boxes.new(path,boxes)
+    def load
+      @boxes = YAML.load(File.read(@path)) if File.exists?(@path)
+      self
     end
 
-    def initialize(path,boxes)
+    def initialize(path)
       @path = path
-      @boxes = boxes
+      @boxes = {}
+      @boxes['file_version'] = Migrant::VERSION
+      @boxes['boxes'] = Hash.new
+      load
     end
 
     def save()
@@ -34,17 +36,20 @@ module Migrant
       end
     end
 
-    def first
-      @boxes[0]
+    def [](environment)
+      environment = 'default' if environment.nil?
+      @boxes['boxes'][environment]
     end
 
-    def [](index)
-      @boxes[index]
+    def []=(environment,box)
+      environment = 'default' if environment.nil?
+      @boxes['boxes'][environment] = box
     end
 
-    def add(provider,name,id)
-      box = Box.new(provider,name,id)
-      @boxes << box
+    def add(environment,provider,id)
+      environment = 'default' if environment.nil?
+      box = Box.new(provider,id)
+      self[environment] = box
     end
   end
 end

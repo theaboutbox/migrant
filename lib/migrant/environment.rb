@@ -1,4 +1,6 @@
 require 'fileutils'
+require 'configuration'
+require 'thor'
 module Migrant
 
   # Holds all the state for this run of Migrant
@@ -6,19 +8,52 @@ module Migrant
     DEFAULT_DATA_PATH = 'data'
     DEFAULT_BOXES_PATH = File.join(DEFAULT_DATA_PATH,'migrant_boxes.yml')
 
-    def initialize
-      Kernel.load 'Migrantfile'
-      @config = Migrant::Config.configuration
-      @ui = Migrant::UI.new(Thor::Base.shell.new)
-      @cloud = Migrant::Clouds::Base.registered(@config.provider).new(self,@config)
-      @bootstrapper = Migrant::Bootstrappers::Base.default.new(self,@config)
-      @provisioner = Migrant::Provisioners::Base.registered(:chef_solo).new(self,@config)
+    def initialize(environment_name,config=nil)
+      @ui = Migrant::UI.new(::Thor::Base.shell.new)
+      @environment_name = environment_name
+      if config
+        @config = config
+      else
+        Kernel.load 'Migrantfile'
+        @config = Configuration.for('migrantfile')
+      end
+      if @environment_name.nil?
+        @ui.notice "Using default environment"
+      elsif @config.include?(@environment_name.to_sym)
+        @ui.notice "Using #{@environment_name} environment"
+      else
+        @ui.error "#{@environment_name} environment is not defined in the configuration file"
+        raise "Environment #{@environment_name} not found"
+      end
+
+      cloud_class = Migrant::Clouds::Base.registered(setting('provider.name'))
+      raise "Cannot find cloud '#{setting('provider.name')}'" if cloud_class.nil?
+      @cloud = cloud_class.new(self)
+      @bootstrapper = Migrant::Bootstrappers::Base.default.new(self)
+      @provisioner = Migrant::Provisioners::Base.registered(:chef_solo).new(self)
       FileUtils.mkdir_p DEFAULT_DATA_PATH unless File.exists?(DEFAULT_DATA_PATH)
-      @boxes = Boxes.load(DEFAULT_BOXES_PATH)
+      @boxes = Boxes.new(DEFAULT_BOXES_PATH).load
     end
 
-    def config
-      @config
+    # Retrieve a setting by name. First try within the context of the current environment.
+    # If the property does not exist there, look in the default property definitions
+    def setting(name)
+      roots = []
+      if @environment_name
+        roots << @config.send(@environment_name)
+      end
+      roots << @config
+      roots.each do |root|
+        begin
+          setting_value = name.split('.').inject(root) { |node,prop| if node.include?(prop.to_sym) then node.send(prop) else raise "Undefined property #{prop} for #{node.name}" end}
+          return setting_value
+        rescue => e
+          # Fall through to next case
+        end
+      end
+      # If we get here the property does not exist
+      #XXX - should probably ask for a default, and if one is not provided, raise an error
+      nil
     end
 
     def up
@@ -29,13 +64,13 @@ module Migrant
     end
 
     def connect
-      ui.warn "Connecting to #{@config.provider.to_s}"
+      ui.warn "Connecting to #{setting('provider.name')}"
       @cloud.connect
     end
 
     def launch!
       @cloud.bootstrap_server
-      @boxes.add(@config.provider,@server.id,@server.name)
+      @boxes.add(@environment_name,setting('provider.name'),@server.id)
       @boxes.save
 
       # persist metadata about server so we can load it later
@@ -44,14 +79,14 @@ module Migrant
 
     # If the server exists, connect to it. If not, bootstrap it
     def init_server
-      box = @boxes.first
+      box = @boxes[@environment_name]
       if box.nil?
         launch!
       else
         @cloud.connect_to_server(box)
       end
     end
-    
+
     def info
       box = @boxes.first
       if box.nil?

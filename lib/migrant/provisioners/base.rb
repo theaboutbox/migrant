@@ -10,9 +10,8 @@ module Migrant
         @@provisioners[shortcut]
       end
       
-      def initialize(env,config)
+      def initialize(env)
         @environment = env
-        @config = config
       end
 
       # Upload any necessary files

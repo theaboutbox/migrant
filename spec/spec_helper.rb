@@ -1,0 +1,2 @@
+$:.push('./lib')
+require 'migrant'

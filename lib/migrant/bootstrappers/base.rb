@@ -20,9 +20,8 @@ module Migrant
         @@default
       end
       
-      def initialize(env,config)
+      def initialize(env)
         @environment = env
-        @config = config
       end
 
       # Run the bootstrapping process
