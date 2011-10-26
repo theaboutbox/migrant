@@ -1,5 +1,4 @@
 require 'fog'
-require 'pry'
 module Migrant
   module Clouds
     
