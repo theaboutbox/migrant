@@ -13,7 +13,13 @@ Installation
 ------------
 
 ```
-  $ gem install migrant_boxes
+  $ gem install migrant-boxes
+```
+
+Or in a `Gemfile`:
+
+```ruby
+  gem 'migrant-boxes'
 ```
 
 Examples
