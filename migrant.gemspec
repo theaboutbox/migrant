@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.email       = ["cameron@theaboutbox.com"]
   s.homepage    = "http://github.com/theaboutbox/migrant"
   s.summary     = %q{Take your Vagrant to the Cloud}
-  s.description = %q{A simple an opinionated way to replicate a Vagrant setup on EC2 or Rackspace}
+  s.description = %q{A simple and opinionated way to replicate a Vagrant setup on EC2 or Rackspace}
 
   s.rubyforge_project = "migrant-boxes"
 
