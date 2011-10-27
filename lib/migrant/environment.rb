@@ -109,11 +109,12 @@ module Migrant
     end
 
     def destroy
-      box = @boxes.first
+      box = @boxes[@environment_name]
 
       if box.nil?
         @ui.error "There are currently no boxes running"
       else
+        #XXX Don't wnat to delete the file, just remove the part about this box.
         if @cloud.destroy(box)
           FileUtils.rm DEFAULT_BOXES_PATH
         end
