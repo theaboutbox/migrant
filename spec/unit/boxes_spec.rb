@@ -58,5 +58,10 @@ describe Migrant::Boxes do
     it 'writes an instance id' do
       boxes['testing'].id.should == '123456'
     end
+
+    it 'removes environments' do
+      boxes.remove('testing').save
+      boxes['testing'].should be_nil
+    end
   end
 end

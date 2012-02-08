@@ -50,6 +50,13 @@ module Migrant
       environment = 'default' if environment.nil?
       box = Box.new(provider,id)
       self[environment] = box
+      self
+    end
+
+    def remove(environment)
+      environment = 'default' if environment.nil?
+      @boxes['boxes'].delete(environment)
+      self
     end
   end
 end

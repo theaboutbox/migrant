@@ -1,8 +1,9 @@
 module Migrant
   module Bootstrappers
-    # Installs Ruby 1.9.2 into /usr/local
-    class RubyLocal192 < Base
-      register(:rbenv_192)
+    # Installs Ruby 1.9.3 into /usr/local
+    class RubyLocal193 < Base
+      register(:rbenv_193)
+      default_bootstrapper
 
       def initialize(env)
         super
@@ -15,9 +16,9 @@ module Migrant
           'curl git-core zlib1g zlib1g-dev libssl-dev vim libsqlite3-0 libsqlite3-dev ' +
           'sqlite3 libreadline-dev libxml2-dev autoconf',
           'rm -rf /tmp/ruby-build',
-          'git clone git://github.com/theaboutbox/ruby-build.git /tmp/ruby-build',
+          'git clone https://github.com/sstephenson/ruby-build.git /tmp/ruby-build',
           'cd /tmp/ruby-build && sudo ./install.sh',
-          'sudo ruby-build 1.9.2-p290 /usr/local',
+          'sudo ruby-build 1.9.3-p0 /usr/local',
           'sudo gem install bundler chef'
         ]
         @environment.cloud.execute commands
